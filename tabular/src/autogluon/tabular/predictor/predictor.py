@@ -697,7 +697,12 @@ class TabularPredictor:
                 logger.log(20, f'Warning: Training may take a very long time because `time_limit` was not specified and `train_data` is large ({num_rows_train} samples, {round(mb_mem_usage_train_data, 2)} MB).')
                 logger.log(20, f'\tConsider setting `time_limit` to ensure training finishes within an expected duration or experiment with a small portion of `train_data` to identify an ideal `presets` and `hyperparameters` configuration.')
 
-        core_kwargs = {'ag_args': ag_args, 'ag_args_ensemble': ag_args_ensemble, 'ag_args_fit': ag_args_fit, 'excluded_model_types': excluded_model_types}
+        core_kwargs = {
+            'ag_args': ag_args,
+            'ag_args_ensemble': ag_args_ensemble,
+            'ag_args_fit': ag_args_fit,
+            'excluded_model_types': excluded_model_types,
+        }
         self._learner.fit(X=train_data, X_val=tuning_data, X_unlabeled=unlabeled_data,
                           holdout_frac=holdout_frac, num_bag_folds=num_bag_folds, num_bag_sets=num_bag_sets, num_stack_levels=num_stack_levels,
                           hyperparameters=hyperparameters, core_kwargs=core_kwargs, time_limit=time_limit, verbosity=verbosity)
@@ -2276,9 +2281,14 @@ class TabularPredictor:
         if unlabeled_data is not None and isinstance(unlabeled_data, str):
             unlabeled_data = TabularDataset(unlabeled_data)
 
+        if not isinstance(train_data, pd.DataFrame):
+            raise AssertionError(f'train_data is required to be a pandas DataFrame, but was instead: {type(train_data)}')
+
         if len(set(train_data.columns)) < len(train_data.columns):
             raise ValueError("Column names are not unique, please change duplicated column names (in pandas: train_data.rename(columns={'current_name':'new_name'})")
         if tuning_data is not None:
+            if not isinstance(tuning_data, pd.DataFrame):
+                raise AssertionError(f'tuning_data is required to be a pandas DataFrame, but was instead: {type(tuning_data)}')
             train_features = [column for column in train_data.columns if column != self.label]
             tuning_features = [column for column in tuning_data.columns if column != self.label]
             if self.sample_weight is not None:
@@ -2291,6 +2301,8 @@ class TabularPredictor:
             if np.any(train_features != tuning_features):
                 raise ValueError("Column names must match between training and tuning data")
         if unlabeled_data is not None:
+            if not isinstance(unlabeled_data, pd.DataFrame):
+                raise AssertionError(f'unlabeled_data is required to be a pandas DataFrame, but was instead: {type(unlabeled_data)}')
             train_features = [column for column in train_data.columns if column != self.label]
             unlabeled_features = [column for column in unlabeled_data.columns]
             if self.sample_weight is not None:

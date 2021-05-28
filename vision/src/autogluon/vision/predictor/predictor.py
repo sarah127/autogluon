@@ -19,6 +19,8 @@ from ..utils import MXNetErrorCatcher
 
 __all__ = ['ImagePredictor']
 
+from autogluon.core.utils.multiprocessing_utils import is_fork_enabled
+
 logger = logging.getLogger()  # return root logger
 
 
@@ -328,6 +330,9 @@ class ImagePredictor(object):
             config['max_reward'] = max_reward
         if nthreads_per_trial is not None:
             config['nthreads_per_trial'] = nthreads_per_trial
+        elif is_fork_enabled():
+            # This is needed to address multiprocessing.context.TimeoutError in fork mode
+            config['nthreads_per_trial'] = 0
         if ngpus_per_trial is not None:
             config['ngpus_per_trial'] = ngpus_per_trial
         if isinstance(hyperparameters, dict):
@@ -358,6 +363,12 @@ class ImagePredictor(object):
             config['early_stop_baseline'] = -np.Inf
         if 'early_stop_max_value' not in config or config['early_stop_max_value'] == None:
             config['early_stop_max_value'] = np.Inf
+        # batch size cannot be larger than dataset size
+        bs = min(config.get('batch_size', 16), len(train_data))
+        config['batch_size'] = bs
+        if ngpus_per_trial is not None and ngpus_per_trial > 1 and bs < ngpus_per_trial:
+            # batch size must be larger than # gpus
+            config['ngpus_per_trial'] = bs
         # verbosity
         if log_level > logging.INFO:
             logging.getLogger('gluoncv.auto.tasks.image_classification').propagate = False
@@ -415,9 +426,13 @@ class ImagePredictor(object):
         elif isinstance(data, _ImageClassification.Dataset):
             assert 'label' in data.columns
             assert hasattr(data, 'classes')
+            orig_classes = data.classes
+            if not isinstance(data.classes, (tuple, list)):
+                # consider it as an invalid dataset without proper label, try to reconstruct as a normal DataFrame
+                orig_classes = []
             # check whether classes are outdated, no action required if all unique labels is subset of `classes`
             unique_labels = sorted(data['label'].unique().tolist())
-            if not (all(ulabel in data.classes for ulabel in unique_labels)):
+            if not (all(ulabel in orig_classes for ulabel in unique_labels)):
                 data = _ImageClassification.Dataset(data, classes=unique_labels)
                 logger.log(20, f'Reset labels to {unique_labels}')
         if len(data) < 1:

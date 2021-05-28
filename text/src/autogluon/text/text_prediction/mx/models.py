@@ -1208,7 +1208,7 @@ class MultiModalTextModel:
                 data = load_pd.load(data)
             else:
                 raise NotImplementedError(f'The format of data is not understood. '
-                                          f'We have type(data)="{type(data)}"')
+                                          f'We have type(data)="{type(data)}", but a pandas DataFrame was required.')
         dataset = self.preprocessor.transform(data[self._feature_columns])
         inference_batch_size = self.config.optimization.per_device_batch_size \
             * self.config.optimization.val_batch_size_mult
@@ -1394,7 +1394,7 @@ class MultiModalTextModel:
         # TODO(sxjscience) Post 0.1. In general, we will need to support compatible version check
         version = assets['version']
         backbone_model_cls, backbone_cfg, tokenizer, backbone_params_path, _ \
-            = get_backbone(cfg.model.backbone.name)
+            = get_backbone(cfg.model.backbone.name, load_backbone=False)
         if 'roberta' in cfg.model.backbone.name:
             text_backbone = backbone_model_cls.from_cfg(backbone_cfg, return_all_hiddens=True)
         else:
