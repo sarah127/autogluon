@@ -11,13 +11,13 @@ from autogluon.core.utils.loaders import load_pkl
 from autogluon.core.utils.savers import save_pkl
 from autogluon.core.utils.utils import generate_kfold, _compute_fi_with_stddev
 
-from autogluon.core.abstract.abstract_model import AbstractModel
+from autogluon.core.models.abstract.abstract_model import AbstractModel
 
 logger = logging.getLogger(__name__)
 
 
 # TODO: Add metadata object with info like score on each model, train time on each model, etc.
-class Deep_Learning(AbstractModel):
+class BaggedEnsembleModel(AbstractModel):
     """
     Bagged ensemble meta-model which fits a given model multiple times across different splits of the training data.
 
@@ -744,11 +744,12 @@ from autogluon.core.features.types import R_OBJECT, S_TEXT_NGRAM, S_TEXT_AS_CATE
 from autogluon.core.utils import try_import_mxboard, try_import_mxnet
 from autogluon.core.utils.exceptions import TimeLimitExceeded
 
-from .categorical_encoders import OneHotMergeRaresHandleUnknownEncoder, OrdinalMergeRaresHandleUnknownEncoder
-from .hyperparameters.parameters import get_default_param
-from .hyperparameters.searchspaces import get_default_searchspace
+#from autogluon.tabular.models
+from autogluon.tabular.models.tabular_nn.categorical_encoders import OneHotMergeRaresHandleUnknownEncoder, OrdinalMergeRaresHandleUnknownEncoder
+from autogluon.tabular.models.tabular_nn.hyperparameters.parameters import get_default_param
+from autogluon.tabular.models.tabular_nn.hyperparameters.searchspaces import get_default_searchspace
 from autogluon.core.models.abstract.abstract_model import AbstractNeuralNetworkModel
-from ..utils import fixedvals_from_searchspaces
+from autogluon.tabular.models.utils import fixedvals_from_searchspaces
 
 warnings.filterwarnings("ignore", module='sklearn.preprocessing')  # sklearn processing n_quantiles warning
 logger = logging.getLogger(__name__)
