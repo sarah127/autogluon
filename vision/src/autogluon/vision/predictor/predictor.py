@@ -16,7 +16,7 @@ from autogluon.core.utils import set_logger_verbosity
 from autogluon.core.utils import verbosity2loglevel, get_gpu_count
 from autogluon.core.utils.utils import generate_train_test_split
 from ..configs.presets_configs import unpack, _check_gpu_memory_presets
-from ..utils import MXNetErrorCatcher
+from ..utils import MXNetErrorCatcher, sanitize_batch_size
 
 __all__ = ['ImagePredictor']
 
@@ -94,10 +94,9 @@ class ImagePredictor(object):
             can be a dataframe like image dataset.
             If a string is provided, will search for k8 datasets.
             If `None`, the validation dataset will be randomly split from `train_data` according to `holdout_frac`.
-        time_limit : int, default = 'auto'(defaults to 2 hours if no presets detected)
+        time_limit : int, default = 'auto' (defaults to 2 hours if no presets detected)
             Time limit in seconds, if `None`, will run until all tuning and training finished.
-            If `time_limit` is hit during `fit`, the
-            HPO process will interrupt and return the current best configuration.
+            If `time_limit` is hit during `fit`, the HPO process will interrupt and return the current best configuration.
         presets : list or str or dict, default = ['medium_quality_faster_train']
             List of preset configurations for various arguments in `fit()`. Can significantly impact predictive accuracy, memory-footprint, and inference latency of trained models,
             and various other properties of the returned `predictor`.
@@ -115,21 +114,25 @@ class ImagePredictor(object):
             try to reduce `batch_size` if OOM("RuntimeError: CUDA error: out of memory") happens frequently during the `fit`.
 
             In-depth Preset Info:
+                # Best predictive accuracy with little consideration to inference time or model size. Achieve even better results by specifying a large time_limit value.
+                # Recommended for applications that benefit from the best possible model accuracy.
                 best_quality={
                     'hyperparameters': {
                         'model': Categorical('resnet50_v1b', 'resnet101_v1d', 'resnest200'),
                         'lr': Real(1e-5, 1e-2, log=True),
                         'batch_size': Categorical(8, 16, 32, 64, 128),
                         'epochs': 200,
-                        'early_stop_patience': -1
+                        'early_stop_patience': 50
                         },
                     'hyperparameter_tune_kwargs': {
                         'num_trials': 1024,
-                        'search_strategy': 'bayesopt'},
-                    'time_limit': 12*3600,}
-                    Best predictive accuracy with little consideration to inference time or model size. Achieve even better results by specifying a large time_limit value.
-                    Recommended for applications that benefit from the best possible model accuracy.
+                        'searcher': 'random',
+                    },
+                    'time_limit': 12*3600,
+                },
 
+                # Good predictive accuracy with fast inference.
+                # Recommended for applications that require reasonable inference speed and/or model size.
                 good_quality_fast_inference={
                     'hyperparameters': {
                         'model': Categorical('resnet50_v1b', 'resnet34_v1b'),
@@ -140,11 +143,13 @@ class ImagePredictor(object):
                         },
                     'hyperparameter_tune_kwargs': {
                         'num_trials': 512,
-                        'search_strategy': 'bayesopt'},
-                    'time_limit': 8*3600,}
-                    Good predictive accuracy with fast inference.
-                    Recommended for applications that require reasonable inference speed and/or model size.
+                        'searcher': 'random',
+                    },
+                    'time_limit': 8*3600,
+                },
 
+                # Medium predictive accuracy with very fast inference and very fast training time.
+                # This is the default preset in AutoGluon, but should generally only be used for quick prototyping.
                 medium_quality_faster_train={
                     'hyperparameters': {
                         'model': 'resnet50_v1b',
@@ -153,14 +158,11 @@ class ImagePredictor(object):
                         'epochs': 50,
                         'early_stop_patience': 5
                         },
-                    'hyperparameter_tune_kwargs': {
-                        'num_trials': 8,
-                        'search_strategy': 'random'},
-                    'time_limit': 1*3600,}
+                    'time_limit': 1*3600,
+                },
 
-                    Medium predictive accuracy with very fast inference and very fast training time.
-                    This is the default preset in AutoGluon, but should generally only be used for quick prototyping.
-
+                # Medium predictive accuracy with very fast inference.
+                # Comparing with `medium_quality_faster_train` it uses faster model but explores more hyperparameters.
                 medium_quality_faster_inference={
                     'hyperparameters': {
                         'model': Categorical('resnet18_v1b', 'mobilenetv3_small'),
@@ -171,11 +173,10 @@ class ImagePredictor(object):
                         },
                     'hyperparameter_tune_kwargs': {
                         'num_trials': 32,
-                        'search_strategy': 'bayesopt'},
-                        'time_limit': 2*3600,}
-
-                    Medium predictive accuracy with very fast inference.
-                    Comparing with `medium_quality_faster_train` it uses faster model but explores more hyperparameters.
+                        'searcher': 'random',
+                    },
+                    'time_limit': 2*3600,
+                },
         hyperparameters : dict, default = None
             Extra hyperparameters for specific models.
             Accepted args includes(not limited to):
@@ -272,6 +273,7 @@ class ImagePredictor(object):
 
         use_rec = False
         if isinstance(train_data, str) and train_data == 'imagenet':
+            # FIXME: imagenet does not work, crashes in validating data due to empty DataFrames.
             logger.warning('ImageNet is a huge dataset which cannot be downloaded directly, ' +
                            'please follow the data preparation tutorial in GluonCV.' +
                            'The following record files(symlinks) will be used: \n' +
@@ -308,17 +310,19 @@ class ImagePredictor(object):
         train_labels_cleaned = self._label_cleaner.transform(train_labels)
         # converting to internal label set
         _set_valid_labels(train_data, train_labels_cleaned)
+        tuning_data_validated = False
         if tuning_data is None:
             train_data, tuning_data, _, _ = generate_train_test_split(X=train_data, y=train_data[self._label_inner], problem_type=self._problem_type, test_size=holdout_frac)
             logger.info('Randomly split train_data into train[%d]/validation[%d] splits.',
                               len(train_data), len(tuning_data))
             train_data = train_data.reset_index(drop=True)
             tuning_data = tuning_data.reset_index(drop=True)
+            tuning_data_validated = True
 
         train_data = self._validate_data(train_data)
         if isinstance(train_data, self.Dataset):
             train_data = self.Dataset(train_data, classes=train_data.classes)
-        if tuning_data is not None:
+        if tuning_data is not None and not tuning_data_validated:
             tuning_data = self._validate_data(tuning_data)
             # converting to internal label set
             _set_valid_labels(tuning_data, self._label_cleaner.transform(_get_valid_labels(tuning_data)))
@@ -385,11 +389,12 @@ class ImagePredictor(object):
         if 'early_stop_max_value' not in config or config['early_stop_max_value'] == None:
             config['early_stop_max_value'] = np.Inf
         # batch size cannot be larger than dataset size
-        bs = min(config.get('batch_size', 16), len(train_data))
+        if ngpus_per_trial is not None and ngpus_per_trial > 1:
+            min_value = ngpus_per_trial
+        else:
+            min_value = 1
+        bs = sanitize_batch_size(config.get('batch_size', 16), min_value=min_value, max_value=len(train_data))
         config['batch_size'] = bs
-        if ngpus_per_trial is not None and ngpus_per_trial > 1 and bs < ngpus_per_trial:
-            # batch size must be larger than # gpus
-            config['ngpus_per_trial'] = bs
         # verbosity
         if log_level > logging.INFO:
             logging.getLogger('gluoncv.auto.tasks.image_classification').propagate = False
@@ -430,14 +435,14 @@ class ImagePredictor(object):
                     sample = data.iloc[0]['image']
                     if not os.path.isfile(sample):
                         raise OSError(f'Detected invalid image path `{sample}`, please ensure all image paths are absolute or you are using the right working directory.')
-                    logger.log(20, 'Converting raw DataFrame to ImagePredictor.Dataset...')
+                    logger.log(20, 'Converting raw DataFrame to ImageDataset...')
                     if self._problem_type in [MULTICLASS, BINARY]:
                         infer_classes = sorted(data.label.unique().tolist())
                         logger.log(20, f'Detected {len(infer_classes)} unique classes: {infer_classes}')
                     elif self._problem_type == REGRESSION:
                         infer_classes = []
                         logger.log(20, 'Set classes = [] for regression problems')
-                    instruction = 'train_data = ImagePredictor.Dataset(train_data, classes=["foo", "bar"])'
+                    instruction = 'train_data = ImageDataset(train_data, classes=["foo", "bar"])'
                     logger.log(20, f'If you feel the `classes` is inaccurate, please construct the dataset explicitly, e.g. {instruction}')
                     data = _ImageClassification.Dataset(data, classes=infer_classes)
                 else:
@@ -519,15 +524,8 @@ class ImagePredictor(object):
             raise RuntimeError('Classifier is not initialized, try `fit` first.')
         assert self._label_cleaner is not None
         y_pred_proba = self._classifier.predict(data, with_proba=True)
-        if isinstance(data, pd.DataFrame) and 'image' in data:
-            index_name = data.index.name
-            if index_name is None:
-                # TODO: This crashes if a feature is already named 'index'.
-                index_name = 'index'
-            idx_to_image_map = data[['image']]
-            idx_to_image_map = idx_to_image_map.reset_index(drop=False)
-            y_pred_proba = idx_to_image_map.merge(y_pred_proba, on='image')
-            y_pred_proba = y_pred_proba.set_index(index_name).rename_axis(None)
+        if isinstance(data, pd.DataFrame):
+            y_pred_proba.index = data.index
         if self._problem_type in [MULTICLASS, BINARY]:
             y_pred_proba[list(self._label_cleaner.cat_mappings_dependent_var.values())] = y_pred_proba['image_proba'].to_list()
             ret = y_pred_proba.drop(['image', 'image_proba'], axis=1, errors='ignore')
@@ -558,7 +556,7 @@ class ImagePredictor(object):
         """
         if self._problem_type in [REGRESSION]:
             return self.predict_proba(data, as_pandas)
-        
+
         if self._classifier is None:
             raise RuntimeError('Classifier is not initialized, try `fit` first.')
         assert self._label_cleaner is not None

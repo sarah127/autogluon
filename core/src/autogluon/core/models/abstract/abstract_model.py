@@ -144,6 +144,8 @@ class AbstractModel:
 
         self.params_trained = dict()
         self._is_initialized = False
+        self._is_fit_metadata_registered = False
+        self._fit_metadata = dict()
 
     def _init_params(self):
         hyperparameters = self._user_params
@@ -155,13 +157,10 @@ class AbstractModel:
         self.params_trained = dict()
 
     def _init_params_aux(self):
-        hyperparameters = self._user_params_aux
+        hyperparameters_aux = self._user_params_aux
         self._set_default_auxiliary_params()
-        if hyperparameters is not None:
-            hyperparameters = hyperparameters.copy()
-            if AG_ARGS_FIT in hyperparameters:
-                ag_args_fit = hyperparameters.pop(AG_ARGS_FIT)
-                self.params_aux.update(ag_args_fit)
+        if hyperparameters_aux is not None:
+            self.params_aux.update(hyperparameters_aux)
 
     @property
     def path_suffix(self):
@@ -181,6 +180,10 @@ class AbstractModel:
     def is_fit(self) -> bool:
         """Returns True if the model has been fit."""
         return self.model is not None
+
+    def can_fit(self) -> bool:
+        """Returns True if the model can be fit."""
+        return not self.is_fit()
 
     # TODO: v0.1 update to be aligned with _set_default_auxiliary_params(), add _get_default_params()
     def _set_default_params(self):
@@ -438,6 +441,21 @@ class AbstractModel:
             logger.log(15, f"\tFitting {self.name} with 'num_gpus': {kwargs['num_gpus']}, 'num_cpus': {kwargs['num_cpus']}")
         return kwargs
 
+    def _register_fit_metadata(self, **kwargs):
+        """
+        Used to track properties of the inputs received during fit, such as if validation data was present.
+        """
+        if not self._is_fit_metadata_registered:
+            self._fit_metadata = self._compute_fit_metadata(**kwargs)
+            self._is_fit_metadata_registered = True
+
+    def _compute_fit_metadata(self, X_val=None, X_unlabeled=None, **kwargs):
+        fit_metadata = dict(
+            val_in_fit=X_val is not None,
+            unlabeled_in_fit=X_unlabeled is not None
+        )
+        return fit_metadata
+
     def fit(self, **kwargs):
         """
         Fit model to predict values in y based on X.
@@ -493,7 +511,12 @@ class AbstractModel:
         kwargs = self.initialize(**kwargs)  # FIXME: This might have to go before self._preprocess_fit_args, but then time_limit might be incorrect in **kwargs init to initialize
         kwargs = self._preprocess_fit_args(**kwargs)
         if 'time_limit' not in kwargs or kwargs['time_limit'] is None or kwargs['time_limit'] > 0:
-            self._fit(**kwargs)
+            self._register_fit_metadata(**kwargs)
+            out = self._fit(**kwargs)
+            if out is None:
+                return self
+            else:
+                return out
         else:
             logger.warning(f'\tWarning: Model has no time left to train, skipping model... (Time Left = {round(kwargs["time_limit"], 1)}s)')
             raise TimeLimitExceeded
@@ -680,8 +703,13 @@ class AbstractModel:
         banned_features = [feature for feature, importance in feature_importance_quick_dict.items() if importance == 0 and feature in features]
         features_to_check = [feature for feature in features if feature not in banned_features]
 
-        fi_df = self._compute_permutation_importance(X=X, y=y, features=features_to_check, silent=silent, importance_as_list=importance_as_list, **kwargs)
-        n = fi_df.iloc[0]['n'] if len(fi_df) > 0 else 1
+        if features_to_check:
+            fi_df = self._compute_permutation_importance(X=X, y=y, features=features_to_check, silent=silent, importance_as_list=importance_as_list, **kwargs)
+            n = fi_df.iloc[0]['n'] if len(fi_df) > 0 else 1
+        else:
+            fi_df = None
+            n = kwargs.get('num_shuffle_sets', 1)
+
         if importance_as_list:
             banned_importance = [0] * n
             results_banned = pd.Series(data=[banned_importance for _ in range(len(banned_features))], index=banned_features, dtype='object')
@@ -693,7 +721,11 @@ class AbstractModel:
         results_banned_df['stddev'] = 0
         results_banned_df['n'] = n
         results_banned_df['n'] = results_banned_df['n'].astype('int64')
-        fi_df = pd.concat([fi_df, results_banned_df]).sort_values(ascending=False, by='importance')
+        if fi_df is not None:
+            fi_df = pd.concat([fi_df, results_banned_df])
+        else:
+            fi_df = results_banned_df
+        fi_df = fi_df.sort_values(ascending=False, by='importance')
 
         return fi_df
 

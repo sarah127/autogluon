@@ -1,7 +1,7 @@
 # Predicting Columns in a Table - In Depth
 :label:`sec_tabularadvanced`
 
-**Tip**: If you are new to AutoGluon, review :ref:`sec_tabularquick` to learn the basics of the AutoGluon API.
+**Tip**: If you are new to AutoGluon, review :ref:`sec_tabularquick` to learn the basics of the AutoGluon API. To learn how to add your own custom models to the set that AutoGluon trains, tunes, and ensembles, review :ref:`sec_tabularcustommodel`.
 
 This tutorial describes how you can exert greater control when using AutoGluon's `fit()` or `predict()`. Recall that to maximize predictive performance, you should always first try `fit()` with all default arguments except `eval_metric` and `presets`, before you experiment with other arguments covered in this in-depth tutorial like `hyperparameter_tune_kwargs`, `hyperparameters`, `num_stack_levels`, `num_bag_folds`, `num_bag_sets`, etc.
 
@@ -87,7 +87,7 @@ perf = predictor.evaluate(test_data, auxiliary_metrics=False)
 Use the following to view a summary of what happened during fit. Now this command will show details of the hyperparameter-tuning process for each type of model:
 
 ```{.python .input}
-results = predictor.fit_summary()
+results = predictor.fit_summary(show_plot=True)
 ```
 
 In the above example, the predictive performance may be poor because we specified very little training to ensure quick runtimes.  You can call `fit()` multiple times while modifying the above settings to better understand how these choices affect performance outcomes. For example: you can comment out the `train_data.head` command or increase `subsample_size` to train using a larger dataset, increase the `num_epochs` and `num_boost_round` hyperparameters, and increase the `time_limit` (which you should do for all code in these tutorials).  To see more detailed output during the execution of `fit()`, you can also pass in the argument: `verbosity = 3`.

@@ -1,5 +1,7 @@
 max_time = 180
 
+// ipykernel>=6.0.0 crashes CI during tutorials
+// pandas==1.3.0 crashes CI during tutorials (FIXME: Revamp openml tutorials, fix object detection)
 setup_pip_venv = """
     rm -rf venv
     conda list
@@ -10,6 +12,7 @@ setup_pip_venv = """
     python3 -m pip install -U setuptools wheel
 
     python3 -m pip install 'graphviz'
+    python3 -m pip install 'ipykernel>=4.5.1,<6.0.0'
     python3 -m pip install 'jupyter-sphinx>=0.2.2'
     python3 -m pip install 'portalocker'
     python3 -m pip install 'nose'
@@ -66,6 +69,10 @@ install_text = """
 
 install_vision = """
     python3 -m pip install --upgrade -e vision/
+"""
+
+install_forecasting = """
+    python3 -m pip install --upgrade -e forecasting/
 """
 
 stage("Unit Test") {
@@ -279,6 +286,34 @@ stage("Unit Test") {
       }
     }
   },
+  'forecasting': {
+    node('linux-gpu') {
+      ws('workspace/autogluon-forecasting-py3-v3') {
+        timeout(time: max_time, unit: 'MINUTES') {
+          checkout scm
+          VISIBLE_GPU=env.EXECUTOR_NUMBER.toInteger() % 8
+          sh """#!/bin/bash
+          set -ex
+          conda env update -n autogluon-forecasting-py3-v3 -f docs/build.yml
+          conda activate autogluon-forecasting-py3-v3
+          conda list
+          ${setup_pip_venv}
+          ${setup_mxnet_gpu}
+          export CUDA_VISIBLE_DEVICES=${VISIBLE_GPU}
+          env
+          ${install_core}
+          ${install_features}
+          ${install_tabular_all}
+          ${install_mxnet}
+          ${install_forecasting}
+          cd forecasting/
+          python3 -m pytest --junitxml=results.xml --runslow tests
+          ${cleanup_venv}
+          """
+        }
+      }
+    }
+  },
   'install': {
     node('linux-cpu') {
       ws('workspace/autogluon-install-py3-v3') {
@@ -309,6 +344,8 @@ stage("Unit Test") {
           cd ../extra/
           python3 -m pip install --upgrade -e .
           cd ../vision/
+          python3 -m pip install --upgrade -e .
+          cd ../forecasting/
           python3 -m pip install --upgrade -e .
           cd ../autogluon/
           python3 -m pip install --upgrade -e .
@@ -636,6 +673,10 @@ stage("Build Docs") {
         cd ..
 
         cd vision/
+        python3 -m pip install --upgrade -e .
+        cd ..
+        
+        cd forecasting/
         python3 -m pip install --upgrade -e .
         cd ..
 
