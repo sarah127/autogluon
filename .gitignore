@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Extra
 *.params
 *.states
@@ -18,13 +19,22 @@ __pycache__/
 *$py.class
 *.swp
 .DS_Store
+=======
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+>>>>>>> DeepInsight/master
 
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
+<<<<<<< HEAD
 env/
+=======
+>>>>>>> DeepInsight/master
 build/
 develop-eggs/
 dist/
@@ -37,11 +47,20 @@ parts/
 sdist/
 var/
 wheels/
+<<<<<<< HEAD
 *.egg-info/
 .installed.cfg
 *.egg
 *.lock
 *.dirlock
+=======
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+>>>>>>> DeepInsight/master
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -56,13 +75,23 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+<<<<<<< HEAD
+=======
+.nox/
+>>>>>>> DeepInsight/master
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
+<<<<<<< HEAD
 .hypothesis/
+=======
+*.py,cover
+.hypothesis/
+.pytest_cache/
+>>>>>>> DeepInsight/master
 
 # Translations
 *.mo
@@ -71,29 +100,67 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
+<<<<<<< HEAD
 
 # Flask stuff:
 # instance/
+=======
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+>>>>>>> DeepInsight/master
 .webassets-cache
 
 # Scrapy stuff:
 .scrapy
 
+<<<<<<< HEAD
+=======
+# Sphinx documentation
+docs/_build/
+
+>>>>>>> DeepInsight/master
 # PyBuilder
 target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
 
+<<<<<<< HEAD
 # pyenv
 .python-version
 
 # celery beat schedule file
 celerybeat-schedule
+=======
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+>>>>>>> DeepInsight/master
 
 # SageMath parsed files
 *.sage.py
 
+<<<<<<< HEAD
 # dotenv
 .env
 
@@ -101,6 +168,16 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+=======
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+>>>>>>> DeepInsight/master
 
 # Spyder project settings
 .spyderproject
@@ -109,6 +186,7 @@ ENV/
 # Rope project settings
 .ropeproject
 
+<<<<<<< HEAD
 # mypy
 .mypy_cache/
 
@@ -137,3 +215,15 @@ vision/src/autogluon/vision/version.py
 
 AutogluonModels
 VERSION.minor
+=======
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+>>>>>>> DeepInsight/master
