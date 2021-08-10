@@ -15,8 +15,10 @@ class TablarToImage():
     def create_model(model_type, num_classes, pretrained=True):
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         if 'resnet18' == model_type:
-            model = models.resnet18(pretrained=pretrained)
-            model.fc = nn.Linear(model.fc.in_features, num_classes)
+            model = models.resnet18(pretrained=pretrained).to(device).double()
+            for param in model.parameters():
+            param.requires_grad = False
+            model.fc = nn.Linear(model.fc.in_features, num_classes).double()
         elif 'resnet34' == model_type:
             model = models.resnet34(pretrained=pretrained)
             model.fc = nn.Linear(model.fc.in_features, num_classes)
