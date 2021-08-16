@@ -24,47 +24,35 @@ class Predictions:
         self._validate_init_kwargs(kwargs)
         Utils_type = kwargs.pop('Utils_type', Utils)
         Utils_kwargs = kwargs.pop('Utils_kwargs', dict())
-        X_train_img  = kwargs.get('X_train_img', None)
-        X_val_img = kwargs.get('X_val_img', None)
-        X_test_img = kwargs.get('X_test_img', None)
-        y_train = kwargs.get('y_train', None)
-        y_val = kwargs.get('y_val', None)
-        y_test = kwargs.get('y_test', None)
+              
+        trainloader = kwargs.get('trainloader', None)
+        valloader = kwargs.get('valloader', None)
+        Testloader = kwargs.get('Testloader', None)
         
-        self._Utils: Utils = Utils_type(X_train_img =X_train_img ,X_val_img=X_val_img ,X_test_img=X_test_img
-                                   ,y_train=y_train,y_val=y_val,y_test=y_test,**Utils_kwargs)
+        
+        self._Utils: Utils = Utils_type(trainloader =trainloader ,valloader=valloader ,
+                                        Testloader=Testloader,**Utils_kwargs)
         self._Utils_type = type(self._Utils)
         #self._trainer = None
+        
     @property
-    def X_train_img(self):
-        return self._Utils.X_train_img    
+    def trainloader(self):
+        return self._Utils.trainloader    
     @property
-    def X_val_img(self):
-        return self._Utils.X_val_img  
+    def valloader(self):
+        return self._Utils.valloader  
     @property
-    def X_test_img(self):
-        return self._Utils.X_test_img   
-    @property
-    def y_train(self):
-        return self._Utils.y_train  
-    @property
-    def y_val(self):
-        return self._Utils.y_val
-    @property
-    def y_test(self):
-        return self._Utils.y_test
-    
+    def Testloader(self):
+        return self._Utils.Testloader    
+     
     @staticmethod
     def _validate_init_kwargs(kwargs):
         valid_kwargs = {
             'Utils_type',
             'Utils_kwargs',
-            'X_train_img',
-            'X_val_img',
-            'X_test_img',
-            'y_train',
-            'y_val',
-            'y_test'
+            'trainloader',
+            'valloader',
+            'Testloader',
         }
         invalid_keys = []
         for key in kwargs:
@@ -72,4 +60,175 @@ class Predictions:
                 invalid_keys.append(key)
         if invalid_keys:
             raise ValueError(f'Invalid kwargs passed: {invalid_keys}\nValid kwargs: {list(valid_kwargs)}')
+    
+        def train(self,dataloader, model, num_epochs=20):
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.Rprop(model.parameters(), lr=0.01)
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
+
+        model.train(True)
+        results = []
+        for epoch in range(num_epochs):
+            optimizer.step()
+            scheduler.step()
+            model.train()
+
+            running_loss = 0.0
+            running_corrects = 0
+
+            n = 0
+            for inputs, labels in dataloader:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+
+                optimizer.zero_grad()
+
+                with torch.set_grad_enabled(True):
+                    outputs = model(inputs)
+                    loss = criterion(outputs, labels)
+                    _, preds = torch.max(outputs, 1)
+
+                    loss.backward()
+                    optimizer.step()
+
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
+                n += len(labels)
+
+            epoch_loss = running_loss / float(n)
+            epoch_acc = running_corrects.double() / float(n)
+
+            print(f'epoch {epoch}/{num_epochs} : {epoch_loss:.5f}, {epoch_acc:.5f}')
+            results.append(EpochProgress(epoch, epoch_loss, epoch_acc.item()))
+        return pd.DataFrame(results)
+
+  
+    def train_model(self,model, num_epochs=3):
+        #criterion = nn.CrossEntropyLoss()
+        #optimizer = optim.Rprop(model.parameters(), lr=0.01)
+        #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
+        since = time.time()
+        best_model_wts = copy.deepcopy(model.state_dict())
+        best_acc = 0.0
         
+        avg_loss = 0
+        avg_acc = 0
+        avg_loss_val = 0
+        avg_acc_val = 0
+        
+        train_batches = len(trainloader)
+        val_batches = len(valloader)
+        
+        for epoch in range(num_epochs):
+            print("Epoch {}/{}".format(epoch, num_epochs))
+            print('-' * 10)
+            
+            loss_train = 0
+            loss_val = 0
+            acc_train = 0
+            acc_val = 0
+            
+            model.train(True)
+            
+            for i, data in enumerate(trainloader):
+                if i % 100 == 0:
+                    print("\rTraining batch {}/{}".format(i, train_batches / 2), end='', flush=True)
+                    
+                # Use half training dataset
+                #if i >= train_batches / 2:
+                #    break
+                    
+                inputs, labels = data
+                
+                if use_gpu:
+                    inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+                else:
+                    inputs, labels = Variable(inputs), Variable(labels)
+                
+                optimizer.zero_grad()
+                
+                outputs = model(inputs)
+                
+                _, preds = torch.max(outputs.data, 1)
+                loss = criterion(outputs, labels)
+                
+                loss.backward()
+                optimizer.step()
+                
+                #loss_train += loss.data[0]
+                loss_train += loss.item() * inputs.size(0)
+                acc_train += torch.sum(preds == labels.data)
+                
+                del inputs, labels, outputs, preds
+                torch.cuda.empty_cache()
+            
+            print()
+            # * 2 as we only used half of the dataset
+            avg_loss = loss_train * 2 /68154#len(X_train_img) #dataset_sizes[TRAIN]
+            avg_acc = acc_train * 2 /68154#len(X_train_img)#dataset_sizes[TRAIN]
+            
+            model.train(False)
+            model.eval()
+                
+            for i, data in enumerate(valloader):
+                if i % 100 == 0:
+                    print("\rValidation batch {}/{}".format(i, val_batches), end='', flush=True)
+                    
+                inputs, labels = data
+                
+                if use_gpu:
+                    inputs, labels = Variable(inputs.cuda(), volatile=True), Variable(labels.cuda(), volatile=True)
+                else:
+                    inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
+                
+                optimizer.zero_grad()
+                
+                outputs = model(inputs)
+                
+                _, preds = torch.max(outputs.data, 1)
+                loss = criterion(outputs, labels)
+                
+                #loss_val += loss.data[0]
+                loss_val += loss.item() * inputs.size(0)
+                acc_val += torch.sum(preds == labels.data)
+                
+                del inputs, labels, outputs, preds
+                torch.cuda.empty_cache()
+            
+            avg_loss_val = loss_val /22718#len(X_val_img) #dataset_sizes[VAL]
+            avg_acc_val = acc_val /22718#len(X_val_img) #dataset_sizes[VAL]
+            
+            print()
+            print("Epoch {} result: ".format(epoch))
+            print("Avg loss (train): {:.4f}".format(avg_loss))
+            print("Avg acc (train): {:.4f}".format(avg_acc))
+            print("Avg loss (val): {:.4f}".format(avg_loss_val))
+            print("Avg acc (val): {:.4f}".format(avg_acc_val))
+            print('-' * 10)
+            print()
+            
+            if avg_acc_val > best_acc:
+                    best_acc = avg_acc_val
+                    best_model_wts = copy.deepcopy(model.state_dict())
+                
+            elapsed_time = time.time() - since
+            print()
+            print("Training completed in {:.0f}m {:.0f}s".format(elapsed_time // 60, elapsed_time % 60))
+            print("Best acc: {:.4f}".format(best_acc))
+            
+            model.load_state_dict(best_model_wts)
+            return model
+    
+    #def plot_results(df, figsize=(10, 5)):
+      #  fig, ax1 = plt.subplots(figsize=figsize)
+
+        #ax1.set_xlabel('epoch')
+        #ax1.set_ylabel('loss', color='tab:red')
+        #ax1.plot(df['epoch'], df['loss'], color='tab:red')
+
+        #ax2 = ax1.twinx()
+        #ax2.set_ylabel('accuracy', color='tab:blue')
+        #ax2.plot(df['epoch'], df['accuracy'], color='tab:blue')
+
+        #fig.tight_layout()
+    
