@@ -61,7 +61,8 @@ class Predictions:
         if invalid_keys:
             raise ValueError(f'Invalid kwargs passed: {invalid_keys}\nValid kwargs: {list(valid_kwargs)}')
     
-        def train(self,dataloader, model, num_epochs=20):
+    """
+    def train(self,dataloader, model, num_epochs=20):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Rprop(model.parameters(), lr=0.01)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
@@ -101,7 +102,7 @@ class Predictions:
             print(f'epoch {epoch}/{num_epochs} : {epoch_loss:.5f}, {epoch_acc:.5f}')
             results.append(EpochProgress(epoch, epoch_loss, epoch_acc.item()))
         return pd.DataFrame(results)
-
+    """
   
     def train_model(self,model, num_epochs=3):
         #criterion = nn.CrossEntropyLoss() #optimizer = optim.Rprop(model.parameters(), lr=0.01) #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
@@ -217,16 +218,17 @@ class Predictions:
             model.load_state_dict(best_model_wts)
             return model
     
-    #def plot_results(df, figsize=(10, 5)):
-      #  fig, ax1 = plt.subplots(figsize=figsize)
+    """
+    def plot_results(df, figsize=(10, 5)):
+        fig, ax1 = plt.subplots(figsize=figsize)
 
-        #ax1.set_xlabel('epoch')
-        #ax1.set_ylabel('loss', color='tab:red')
-        #ax1.plot(df['epoch'], df['loss'], color='tab:red')
+        ax1.set_xlabel('epoch')
+        ax1.set_ylabel('loss', color='tab:red')
+        ax1.plot(df['epoch'], df['loss'], color='tab:red')
 
-        #ax2 = ax1.twinx()
-        #ax2.set_ylabel('accuracy', color='tab:blue')
-        #ax2.plot(df['epoch'], df['accuracy'], color='tab:blue')
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('accuracy', color='tab:blue')
+        ax2.plot(df['epoch'], df['accuracy'], color='tab:blue')
 
-        #fig.tight_layout()
-    
+        fig.tight_layout()
+    """
