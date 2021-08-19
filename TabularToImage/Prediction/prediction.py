@@ -104,9 +104,7 @@ class Predictions:
 
   
     def train_model(self,model, num_epochs=3):
-        #criterion = nn.CrossEntropyLoss()
-        #optimizer = optim.Rprop(model.parameters(), lr=0.01)
-        #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
+        #criterion = nn.CrossEntropyLoss() #optimizer = optim.Rprop(model.parameters(), lr=0.01) #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
         since = time.time()
         best_model_wts = copy.deepcopy(model.state_dict())
         best_acc = 0.0
