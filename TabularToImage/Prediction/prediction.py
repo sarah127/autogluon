@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+import time
+import os
+import copy
 import torch
 #device = torch.device("cuda") #device = 'cuda'
 import torchvision.transforms as transforms
@@ -7,17 +11,12 @@ import torch.optim as optim
 import torchvision
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
-
 from torch.optim import lr_scheduler
 from torch.autograd import Variable
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
-import time
-import os
-import copy
-from autogluon.TablarToImage import  Utils
+from autogluon.TablarToImage.Utils import  Utils
 
 class Predictions:
     def init(self,**kwargs):
@@ -28,10 +27,10 @@ class Predictions:
         trainloader = kwargs.get('trainloader', None)
         valloader = kwargs.get('valloader', None)
         Testloader = kwargs.get('Testloader', None)
-        
+        num_classes = kwargs.get('num_classes', None)
         
         self._Utils: Utils = Utils_type(trainloader =trainloader ,valloader=valloader ,
-                                        Testloader=Testloader,**Utils_kwargs)
+                                        Testloader=Testloader,num_classes=num_classes,**Utils_kwargs)
         self._Utils_type = type(self._Utils)
         #self._trainer = None
         
@@ -44,6 +43,10 @@ class Predictions:
     @property
     def Testloader(self):
         return self._Utils.Testloader    
+    
+    @property
+    def num_classes(self):
+        return self._Utils.num_classes  
      
     @staticmethod
     def _validate_init_kwargs(kwargs):
@@ -53,6 +56,7 @@ class Predictions:
             'trainloader',
             'valloader',
             'Testloader',
+            'num_classes',  
         }
         invalid_keys = []
         for key in kwargs:
