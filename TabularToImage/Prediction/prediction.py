@@ -16,7 +16,7 @@ from torch.autograd import Variable
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-from autogluon.TablarToImage.Utils import  Utils
+from autogluon.TabularToImage.Utils import  Utils
 
 class Predictions:
     def init(self,**kwargs):
