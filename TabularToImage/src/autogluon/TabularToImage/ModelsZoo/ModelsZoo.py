@@ -13,7 +13,8 @@ import time
 import os
 import copy
 #from autogluon.TablarToImage import  Utils
-class TablarToImage():  
+
+class ModelsZoo():  
     def __init__(self, ImageShape,model_type, num_classes, pretrained=True):  
         self.ImageShape = ImageShape 
         self.model_type=model_type

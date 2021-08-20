@@ -17,7 +17,7 @@ import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
 from autogluon.TabularToImage.Utils_pro import  Utils_pro
-from autogluon.TabularToImage.Models-Zoo import TablarToImage
+from autogluon.TabularToImage.ModelsZoo import ModelsZoo
 
 class ImagePredictions:
     
@@ -41,17 +41,17 @@ class ImagePredictions:
         
         trainloader,valloader,Testloader,num_classes =self._Utils_pro.Utils_pro.image_tensor()
         
-        TablarToImage_type = kwargs.pop('TablarToImage_type', Utils_pro)
-        TablarToImage_kwargs = kwargs.pop('TablarToImage_kwargs', dict())
+        ModelsZoo_type = kwargs.pop('ModelsZoo_type', Utils_pro)
+        ModelsZoo_kwargs = kwargs.pop('ModelsZoo_kwargs', dict())
         
                      
         ImageShape = kwargs.get('ImageShape', None)
         model_type = kwargs.get('model_type', None)
         pretrained = kwargs.get('pretrained', None)
               
-        self._TablarToImage: TablarToImage = TablarToImage_type(ImageShape=ImageShape ,model_type=model_type,
+        self._ModelsZoo: ModelsZoo = ModelsZoo_type(ImageShape=ImageShape ,model_type=model_type,
                                         num_classes=num_classes,pretrained=pretrained,**Utils_pro_kwargs)
-        self._TablarToImage_type = type(self._TablarToImage)
+        self._ModelsZoo_type = type(self._ModelsZoo)
         
         
     
@@ -80,13 +80,13 @@ class ImagePredictions:
     
     @property
     def ImageShape(self):
-        return self._TablarToImage.ImageShape 
+        return self._ModelsZoo.ImageShape 
     @property
     def model_type(self):
-        return self._TablarToImage.model_type 
+        return self._ModelsZoo.model_type 
     @property
     def pretrained(self):
-        return self._TablarToImage.pretrained 
+        return self._ModelsZoo.pretrained 
    
      
     @staticmethod
