@@ -17,46 +17,93 @@ import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
 from autogluon.TabularToImage.Utils_pro import  Utils_pro
+from autogluon.TabularToImage.Models-Zoo import TablarToImage
 
 class ImagePredictions:
+    
     def init(self,**kwargs):
         self._validate_init_kwargs(kwargs)
-        Utils_type = kwargs.pop('Utils_type', Utils)
-        Utils_kwargs = kwargs.pop('Utils_kwargs', dict())
+        Utils_pro_type = kwargs.pop('Utils_pro_type', Utils_pro)
+        Utils_pro_kwargs = kwargs.pop('Utils_pro_kwargs', dict())
               
-        trainloader = kwargs.get('trainloader', None)
-        valloader = kwargs.get('valloader', None)
-        Testloader = kwargs.get('Testloader', None)
-        num_classes = kwargs.get('num_classes', None)
+       
+        X_train_img = kwargs.get('X_train_img', None)
+        X_val_img = kwargs.get('X_val_img', None)
+        X_test_img = kwargs.get('X_test_img', None)
         
-        self._Utils_pro: Utils_pro = Utils_type(trainloader =trainloader ,valloader=valloader ,
-                                        Testloader=Testloader,num_classes=num_classes,**Utils_kwargs)
+        y_train = kwargs.get('y_train', None)
+        y_val = kwargs.get('y_val', None)
+        y_test = kwargs.get('y_test', None)
+        
+        self._Utils_pro: Utils_pro = Utils_pro_type(X_train_img=X_train_img ,X_val_img=X_val_img,X_test_img=X_test_img,
+                                        y_train=y_train,y_val=y_val,y_test=y_test,**Utils_pro_kwargs)
         self._Utils_pro_type = type(self._Utils_pro)
-        #self._trainer = None
+        
+        trainloader,valloader,Testloader,num_classes =self._Utils_pro.Utils_pro.image_tensor()
+        
+        TablarToImage_type = kwargs.pop('TablarToImage_type', Utils_pro)
+        TablarToImage_kwargs = kwargs.pop('TablarToImage_kwargs', dict())
+        
+                     
+        ImageShape = kwargs.get('ImageShape', None)
+        model_type = kwargs.get('model_type', None)
+        pretrained = kwargs.get('pretrained', None)
+              
+        self._TablarToImage: TablarToImage = TablarToImage_type(ImageShape=ImageShape ,model_type=model_type,
+                                        num_classes=num_classes,pretrained=pretrained,**Utils_pro_kwargs)
+        self._TablarToImage_type = type(self._TablarToImage)
+        
+        
+    
+    use_gpu = torch.cuda.is_available()
+       
         
     @property
-    def trainloader(self):
-        return self._Utils.trainloader    
+    def X_train_img(self):
+        return self._Utils_pro.X_train_img 
     @property
-    def valloader(self):
-        return self._Utils.valloader  
+    def X_val_img(self):
+        return self._Utils_pro.X_val_img  
     @property
-    def Testloader(self):
-        return self._Utils.Testloader    
+    def X_test_img(self):
+        return self._Utils_pro.X_test_img    
     
     @property
-    def num_classes(self):
-        return self._Utils.num_classes  
+    def y_train(self):
+        return self._Utils_pro.y_train 
+    @property
+    def y_val(self):
+        return self._Utils_pro.y_val 
+    @property
+    def y_test(self):
+        return self._Utils_pro.y_test 
+    
+    @property
+    def ImageShape(self):
+        return self._TablarToImage.ImageShape 
+    @property
+    def model_type(self):
+        return self._TablarToImage.model_type 
+    @property
+    def pretrained(self):
+        return self._TablarToImage.pretrained 
+   
      
     @staticmethod
     def _validate_init_kwargs(kwargs):
         valid_kwargs = {
-            'Utils_type',
-            'Utils_kwargs',
-            'trainloader',
-            'valloader',
-            'Testloader',
-            'num_classes',  
+            'Utils_pro_type',
+            'Utils_pro_kwargs',
+             'X_train_img',
+             'X_val_img',
+             'X_test_img',
+             'y_train',
+             'y_val,y_test',
+             'ImageShape',
+             'model_type',
+             'pretrained',
+             
+       
         }
         invalid_keys = []
         for key in kwargs:
@@ -108,7 +155,7 @@ class ImagePredictions:
         return pd.DataFrame(results)
     """
   
-    def train_model(self,model, num_epochs=3):
+    def train_model(self,trainloader,valloader,model, num_epochs=3):
         #criterion = nn.CrossEntropyLoss() #optimizer = optim.Rprop(model.parameters(), lr=0.01) #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
         since = time.time()
         best_model_wts = copy.deepcopy(model.state_dict())
@@ -118,6 +165,7 @@ class ImagePredictions:
         avg_acc = 0
         avg_loss_val = 0
         avg_acc_val = 0
+        
         
         train_batches = len(trainloader)
         val_batches = len(valloader)
@@ -148,6 +196,7 @@ class ImagePredictions:
                 else:
                     inputs, labels = Variable(inputs), Variable(labels)
                 
+                self
                 optimizer.zero_grad()
                 
                 outputs = model(inputs)
@@ -167,8 +216,8 @@ class ImagePredictions:
             
             print()
             # * 2 as we only used half of the dataset
-            avg_loss = loss_train * 2 /68154#len(X_train_img) #dataset_sizes[TRAIN]
-            avg_acc = acc_train * 2 /68154#len(X_train_img)#dataset_sizes[TRAIN]
+            avg_loss = loss_train * 2 /len(self.X_train_img) #dataset_sizes[TRAIN]
+            avg_acc = acc_train * 2 /len(self.X_train_img)#dataset_sizes[TRAIN]
             
             model.train(False)
             model.eval()
@@ -222,6 +271,52 @@ class ImagePredictions:
             model.load_state_dict(best_model_wts)
             return model
     
+    def eval_model(model,Testloader, criterion):
+        since = time.time()
+        avg_loss = 0
+        avg_acc = 0
+        loss_test = 0
+        acc_test = 0
+        
+        test_batches = len(Testloader)
+        print("Evaluating model")
+        print('-' * 10)
+        
+        for i, data in enumerate(Testloader):
+            if i % 100 == 0:
+                print("\rTest batch {}/{}".format(i, test_batches), end='', flush=True)
+
+            model.train(False)
+            model.eval()
+            inputs, labels = data
+
+            if use_gpu:
+                inputs, labels = Variable(inputs.cuda(), volatile=True), Variable(labels.cuda(), volatile=True)
+            else:
+                inputs, labels = Variable(inputs, volatile=True), Variable(labels, volatile=True)
+
+            outputs = model(inputs)
+
+            _, preds = torch.max(outputs.data, 1)
+            loss = criterion(outputs, labels)
+
+            #loss_test += loss.data[0]
+            loss_test += loss.item() * inputs.size(0)
+            acc_test += torch.sum(preds == labels.data)
+
+            del inputs, labels, outputs, preds
+            torch.cuda.empty_cache()
+            
+        avg_loss = loss_test /len(self.X_test_img) #dataset_sizes[TEST]
+        avg_acc = acc_test /len(self.X_test_img)#dataset_sizes[TEST]
+        
+        elapsed_time = time.time() - since
+        print()
+        print("Evaluation completed in {:.0f}m {:.0f}s".format(elapsed_time // 60, elapsed_time % 60))
+        print("Avg loss (test): {:.4f}".format(avg_loss))
+        print("Avg acc (test): {:.4f}".format(avg_acc))
+        print('-' * 10)
+        
     """
     def plot_results(df, figsize=(10, 5)):
         fig, ax1 = plt.subplots(figsize=figsize)

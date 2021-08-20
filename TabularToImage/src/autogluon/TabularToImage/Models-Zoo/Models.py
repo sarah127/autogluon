@@ -25,166 +25,166 @@ class TablarToImage():
         device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
         if   self.ImageShape=='224':
             if 'resnet18' == self.model_type:
-                model = models.resnet18(pretrained=pretrained).to(device).double()
+                model = models.resnet18(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features,self.num_classes ).double()
             elif 'resnet34' == self.model_type:
-                model = models.resnet34(pretrained=pretrained).to(device).double()
+                model = models.resnet34(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'resnet50' == self.model_type:
-                model = models.resnet50(pretrained=pretrained).to(device).double()
+                model = models.resnet50(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'resnet101' == self.model_type:
-                model = models.resnet101(pretrained=pretrained).to(device).double()
+                model = models.resnet101(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'resnet152' == self.model_type:
-                model = models.resnet152(pretrained=pretrained).to(device).double()
+                model = models.resnet152(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'alexnet' == self.model_type:
-                model = models.alexnet(pretrained=pretrained).to(device).double()
+                model = models.alexnet(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.classifier[6] = nn.Linear(4096, num_classes).double()
+                model.classifier[6] = nn.Linear(4096, self.num_classes).double()
             elif 'vgg11' == self.model_type:
-                model = models.vgg11(pretrained=pretrained).to(device).double()
+                model = models.vgg11(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg11_bn' == self.model_type:
-                model = models.vgg11_bn(pretrained=pretrained).to(device).double()
+                model = models.vgg11_bn(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg13' == self.model_type:
-                model = models.vgg13(pretrained=pretrained).to(device).double()
+                model = models.vgg13(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False    
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg13_bn' == self.model_type:
-                model = models.vgg13_bn(pretrained=pretrained).to(device).double()
+                model = models.vgg13_bn(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg16' == self.model_type:
-                model = models.vgg16(pretrained=pretrained).to(device).double()
+                model = models.vgg16(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg16_bn' == self.model_type:
-                model = models.vgg16_bn(pretrained=pretrained).to(device).double()
+                model = models.vgg16_bn(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg19' == self.model_type:
-                model = models.vgg19(pretrained=pretrained).to(device).double()
+                model = models.vgg19(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'vgg19_bn' == self.model_type:
-                model = models.vgg19_bn(pretrained=pretrained).to(device).double()
+                model = models.vgg19_bn(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes).double()
+                model.classifier[6] = nn.Linear(model.classifier[6].in_features, self.num_classes).double()
             elif 'densenet121' == self.model_type:
-                model = models.densenet121(pretrained=pretrained).to(device).double()
+                model = models.densenet121(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier = nn.Linear(model.classifier.in_features, num_classes).double()
+                model.classifier = nn.Linear(model.classifier.in_features, self.num_classes).double()
             elif 'densenet161' == self.model_type:
-                model = models.densenet161(pretrained=pretrained).to(device).double()
+                model = models.densenet161(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier = nn.Linear(model.classifier.in_features, num_classes).double()
+                model.classifier = nn.Linear(model.classifier.in_features, self.num_classes).double()
             elif 'densenet169' == self.model_type:
-                model = models.densenet169(pretrained=pretrained).to(device).double()
+                model = models.densenet169(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier = nn.Linear(model.classifier.in_features, num_classes).double()
+                model.classifier = nn.Linear(model.classifier.in_features, self.num_classes).double()
             elif 'densenet201' == self.model_type:
-                model = models.densenet201(pretrained=pretrained).to(device).double()
+                model = models.densenet201(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier = nn.Linear(model.classifier.in_features, num_classes).double()
+                model.classifier = nn.Linear(model.classifier.in_features, self.num_classes).double()
             elif 'googlenet' == self.model_type:
-                model = models.googlenet(pretrained=pretrained).to(device).double()
+                model = models.googlenet(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'shufflenet_v2_x0_5' == self.model_type:
-                model = models.shufflenet_v2_x0_5(pretrained=pretrained).to(device).double()
+                model = models.shufflenet_v2_x0_5(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'shufflenet_v2_x1_0' == self.model_type:
-                model = models.shufflenet_v2_x0_0(pretrained=pretrained).to(device).double()
+                model = models.shufflenet_v2_x0_0(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'mobilenet_v2' == self.model_type:
-                model = models.mobilenet_v2(pretrained=pretrained).to(device).double()
+                model = models.mobilenet_v2(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes).double()
+                model.classifier[1] = nn.Linear(model.classifier[1].in_features, self.num_classes).double()
             elif 'wide_resnet50_2' == self.model_type:
-                model = models.wide_resnet50_2(pretrained=pretrained).to(device).double()
+                model = models.wide_resnet50_2(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'wide_resnet101_2' == self.model_type:
-                model = models.wide_resnet101_2(pretrained=pretrained).to(device).double()
+                model = models.wide_resnet101_2(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double
             elif 'mnasnet0_5' == self.model_type:
-                model = models.wide_resnet0_5(pretrained=pretrained).to(device).double()
+                model = models.wide_resnet0_5(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
+                model.classifier[1] = nn.Linear(model.classifier[1].in_features, self.num_classes)
             elif 'mnasnet1_0' == self.model_type:
-                model = models.mnasnet1_0(pretrained=pretrained).to(device).double()
+                model = models.mnasnet1_0(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes).double()         
+                model.classifier[1] = nn.Linear(model.classifier[1].in_features, self.num_classes).double()         
         elif self.ImageShape=='227':
             if 'squeezenet1_0' == self.model_type:
-                model = models.squeezenet1_0(pretrained=pretrained).to(device).double()
+                model = models.squeezenet1_0(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                    model.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1)).double()
-                    model.num_classes = num_classes
+                    model.classifier[1] = nn.Conv2d(512, self.num_classes, kernel_size=(1,1), stride=(1,1)).double()
+                    model.num_classes = self.num_classes
             elif 'squeezenet1_1' == self.model_type:
-                model = models.squeezenet1_1(pretrained=pretrained).to(device).double()
+                model = models.squeezenet1_1(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[1] = nn.Conv2d(512, num_classes, kernel_size=(1,1), stride=(1,1)).double()
-                model.num_classes = num_classes
+                model.classifier[1] = nn.Conv2d(512, self.num_classes, kernel_size=(1,1), stride=(1,1)).double()
+                model.num_classes = self.num_classes
         elif self.ImageShape=='256':
             if 'resnext50_32x4d' == self.model_type:
-                model = models.resnext50_32x4d(pretrained=pretrained).to(device).double()
+                model = models.resnext50_32x4d(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes).double()
+                model.classifier[1] = nn.Linear(model.classifier[1].in_features, self.num_classes).double()
             elif 'resnext101_32x8d' == self.model_type:
-                model = models.resnext50_32x8d(pretrained=pretrained).to(device).double()
+                model = models.resnext50_32x8d(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()         
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()         
         elif self.ImageShape=='299':
             if 'inception_v3' == self.model_type:
-                model = models.inception_v3(pretrained=pretrained).to(device).double()
+                model = models.inception_v3(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
-                model.AuxLogits.fc = nn.Linear(model.AuxLogits.fc.in_features, num_classes).double()
-                model.fc = nn.Linear(model.fc.in_features, num_classes).double()
+                model.AuxLogits.fc = nn.Linear(model.AuxLogits.fc.in_features, self.num_classes).double()
+                model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
         return model.double().to(device)
     
     def optimizer(self):
@@ -202,14 +202,14 @@ class TablarToImage():
             exp_lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor = 0.1, patience =  5, mode = 'max', verbose=True)       
         return   criterion,optimizer,exp_lr_scheduler
 
-np.random.seed(37)
-torch.manual_seed(37)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
+#np.random.seed(37)
+#torch.manual_seed(37)
+#torch.backends.cudnn.deterministic = True
+#torch.backends.cudnn.benchmark = False
 
-num_classes = 3
-pretrained = True
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+#num_classes = 3
+#pretrained = True
+#device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 #EpochProgress = namedtuple('EpochProgress', 'epoch, loss, accuracy')
 

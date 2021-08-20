@@ -64,4 +64,4 @@ class Utils_pro:
 
         Testset = TensorDataset(X_test_tensor, y_test_tensor)
         Testloader = DataLoader(Testset, batch_size=batch_size, shuffle=True)
-        return trainloader,valloader,Testloader,num_classes
+        return trainloader,valloader,Testloader,num_classes 
