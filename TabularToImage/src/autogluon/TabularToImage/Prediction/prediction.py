@@ -16,9 +16,9 @@ from torch.autograd import Variable
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-from autogluon.TabularToImage.Utils import  Utils
+from autogluon.TabularToImage.Utils_pro import  Utils_pro
 
-class Predictions:
+class ImagePredictions:
     def init(self,**kwargs):
         self._validate_init_kwargs(kwargs)
         Utils_type = kwargs.pop('Utils_type', Utils)
@@ -29,9 +29,9 @@ class Predictions:
         Testloader = kwargs.get('Testloader', None)
         num_classes = kwargs.get('num_classes', None)
         
-        self._Utils: Utils = Utils_type(trainloader =trainloader ,valloader=valloader ,
+        self._Utils_pro: Utils_pro = Utils_type(trainloader =trainloader ,valloader=valloader ,
                                         Testloader=Testloader,num_classes=num_classes,**Utils_kwargs)
-        self._Utils_type = type(self._Utils)
+        self._Utils_pro_type = type(self._Utils_pro)
         #self._trainer = None
         
     @property

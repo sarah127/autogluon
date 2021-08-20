@@ -188,10 +188,10 @@ class TablarToImage():
         return model.double().to(device)
     
     def optimizer(self):
+        criterion = nn.CrossEntropyLoss() 
         if self.model_type in []:
             #optimizer = optim.SGD(net.parameters(), lr=1e-4, momentum=0.9)
             optimizer = optim.SGD(self.create_model(self).parameters(), lr=0.001, momentum=0.9)
-            # Decay LR by a factor of 0.1 every 7 epochs
             exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
         elif self.model_type in []:
             optimizer=torch.optim.RMSprop(self.create_model(self), lr=0.01, alpha=0.99, eps=1e-08, weight_decay=0, momentum=0, centered=False)
@@ -199,8 +199,8 @@ class TablarToImage():
             exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
         elif self.model_type in []:
             optimizer = optim.Adam(self.create_model(self).parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-5)
-            exp_lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor = 0.1, patience =  5, mode = 'max', verbose=True)    
-        criterion = nn.CrossEntropyLoss()   
+            exp_lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor = 0.1, patience =  5, mode = 'max', verbose=True)       
+        return   criterion,optimizer,exp_lr_scheduler
 
 np.random.seed(37)
 torch.manual_seed(37)

@@ -27,7 +27,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 
 
-class Utils:
+class Utils_pro:
     def __init__(self, X_train_img ,X_val_img,X_test_img,y_train,y_val,y_test):
       self.X_train_img=X_train_img
       self.X_val_img=X_val_img
