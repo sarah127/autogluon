@@ -39,14 +39,15 @@ class ImagePredictions:
                                         y_train=y_train,y_val=y_val,y_test=y_test,**Utils_pro_kwargs)
         self._Utils_pro_type = type(self._Utils_pro)
         
-        trainloader,valloader,Testloader,num_classes =self._Utils_pro.Utils_pro.image_tensor()
         
-        ModelsZoo_type = kwargs.pop('ModelsZoo_type', Utils_pro)
+        
+        ModelsZoo_type = kwargs.pop('ModelsZoo_type', ModelsZoo)
         ModelsZoo_kwargs = kwargs.pop('ModelsZoo_kwargs', dict())
         
                      
         ImageShape = kwargs.get('ImageShape', None)
         model_type = kwargs.get('model_type', None)
+        num_classes = kwargs.get('num_classes', None)
         pretrained = kwargs.get('pretrained', None)
               
         self._ModelsZoo: ModelsZoo = ModelsZoo_type(ImageShape=ImageShape ,model_type=model_type,
@@ -54,7 +55,9 @@ class ImagePredictions:
         self._ModelsZoo_type = type(self._ModelsZoo)
         
         
-    
+        
+    trainloader,valloader,Testloader =self._Utils_pro.Utils_pro.image_tensor()
+    criterion,optimizer,exp_lr_scheduler=self._ModelsZoo.ModelsZoo.optimizer()
     use_gpu = torch.cuda.is_available()
        
         
@@ -85,6 +88,10 @@ class ImagePredictions:
     def model_type(self):
         return self._ModelsZoo.model_type 
     @property
+    def num_classes(self):
+        return self._ModelsZoo.num_classes 
+    
+    @property
     def pretrained(self):
         return self._ModelsZoo.pretrained 
    
@@ -101,6 +108,7 @@ class ImagePredictions:
              'y_val,y_test',
              'ImageShape',
              'model_type',
+             'num_classes',
              'pretrained',
              
        

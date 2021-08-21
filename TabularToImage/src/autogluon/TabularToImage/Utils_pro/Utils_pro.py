@@ -46,7 +46,7 @@ class Utils_pro:
         batch_size = 64
         
         le = LabelEncoder()
-        num_classes = np.unique(le.fit_transform(self.y_train)).size
+        #num_classes = np.unique(le.fit_transform(self.y_train)).size
         X_train_tensor = torch.stack([preprocess(img) for img in self.X_train_img])
         y_train_tensor = torch.from_numpy(le.fit_transform(self.y_train))
 
@@ -64,4 +64,4 @@ class Utils_pro:
 
         Testset = TensorDataset(X_test_tensor, y_test_tensor)
         Testloader = DataLoader(Testset, batch_size=batch_size, shuffle=True)
-        return trainloader,valloader,Testloader,num_classes 
+        return trainloader,valloader,Testloader#,num_classes 
