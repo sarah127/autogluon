@@ -57,6 +57,7 @@ class ImagePredictions:
         #criterion,optimizer,exp_lr_scheduler=self._ModelsZoo.ModelsZoo.optimizer()
         #use_gpu = torch.cuda.is_available()
         
+        
     
      
         
@@ -94,6 +95,9 @@ class ImagePredictions:
     def pretrained(self):
         return self._ModelsZoo.pretrained 
    
+    @property
+    def model(self):
+        return self._ModelsZoo.ModelsZoo.create_model() 
      
     @staticmethod
     def _validate_init_kwargs(kwargs):
