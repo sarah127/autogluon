@@ -56,9 +56,9 @@ class ImagePredictions:
         #rainloader,valloader,Testloader =self._Utils_pro.Utils_pro.image_tensor()
         #criterion,optimizer,exp_lr_scheduler=self._ModelsZoo.ModelsZoo.optimizer()
         #use_gpu = torch.cuda.is_available()
+        
     
-    
-       
+     
         
     @property
     def X_train_img(self):
@@ -284,6 +284,7 @@ class ImagePredictions:
     def eval_model(self,model, criterion):
         _,_,Testloader =self._Utils_pro.Utils_pro.image_tensor()
         criterion,_,_=self._ModelsZoo.ModelsZoo.optimizer()
+        use_gpu = torch.cuda.is_available()
         since = time.time()
         avg_loss = 0
         avg_acc = 0
