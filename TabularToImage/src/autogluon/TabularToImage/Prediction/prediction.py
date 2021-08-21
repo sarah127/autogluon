@@ -18,7 +18,7 @@ import torchvision
 from torchvision import datasets, models, transforms
 from autogluon.TabularToImage.Utils_pro import  Utils_pro
 from autogluon.TabularToImage.ModelsZoo import ModelsZoo
-
+from autogluon.TabularToImage.ModelsZoo.ModelsZoo import ModelsZoo
 class ImagePredictions:
     
     def init(self,**kwargs):
