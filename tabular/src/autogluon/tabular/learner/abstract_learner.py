@@ -20,7 +20,7 @@ from autogluon.core.utils.savers import save_json, save_pkl
 from autogluon.core.utils import get_pred_from_proba, get_pred_from_proba_df, infer_problem_type
 from autogluon.features.generators import PipelineFeatureGenerator
 
-from ..trainer.abstract_trainer import AbstractTrainer
+from autogluon.tabular.trainer.abstract_trainer import AbstractTrainer
 from autogluon.core.data.label_cleaner import LabelCleaner, LabelCleanerMulticlassToBinary
 
 logger = logging.getLogger(__name__)

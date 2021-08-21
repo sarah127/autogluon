@@ -16,9 +16,8 @@ from autogluon.core.utils import default_holdout_frac, get_pred_from_proba, gene
 from autogluon.core.utils.exceptions import TimeLimitExceeded, NotEnoughMemoryError, NoValidFeatures, NoGPUError
 from autogluon.core.utils.loaders import load_pkl
 from autogluon.core.utils.savers import save_json, save_pkl
-
-from .utils import process_hyperparameters
-from ..augmentation.distill_utils import format_distillation_labels, augment_data
+from autogluon.tabular.trainer.utils import process_hyperparameters
+from autogluon.tabular.augmentation.distill_utils import format_distillation_labels, augment_data
 
 logger = logging.getLogger(__name__)
 

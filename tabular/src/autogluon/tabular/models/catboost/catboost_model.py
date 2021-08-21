@@ -14,9 +14,9 @@ from autogluon.core.models._utils import get_early_stopping_rounds
 from autogluon.core.utils.exceptions import NotEnoughMemoryError, TimeLimitExceeded
 from autogluon.core.utils import try_import_catboost, try_import_catboostdev
 
-from .catboost_utils import construct_custom_catboost_metric
-from .hyperparameters.parameters import get_param_baseline
-from .hyperparameters.searchspaces import get_default_searchspace
+from autogluon.tabular.models.catboost.catboost_utils import construct_custom_catboost_metric
+from autogluon.tabular.models.catboost.hyperparameters.parameters import get_param_baseline
+from autogluon.tabular.models.catboost.hyperparameters.searchspaces import get_default_searchspace
 
 logger = logging.getLogger(__name__)
 
