@@ -53,12 +53,11 @@ class ImagePredictions:
         self._ModelsZoo: ModelsZoo = ModelsZoo_type(ImageShape=ImageShape ,model_type=model_type,
                                         num_classes=num_classes,pretrained=pretrained,**Utils_pro_kwargs)
         self._ModelsZoo_type = type(self._ModelsZoo)
-        
-        
-        
-    trainloader,valloader,Testloader =self._Utils_pro.Utils_pro.image_tensor()
-    criterion,optimizer,exp_lr_scheduler=self._ModelsZoo.ModelsZoo.optimizer()
-    use_gpu = torch.cuda.is_available()
+        trainloader,valloader,Testloader =self._Utils_pro.Utils_pro.image_tensor()
+        criterion,optimizer,exp_lr_scheduler=self._ModelsZoo.ModelsZoo.optimizer()
+        use_gpu = torch.cuda.is_available()
+    
+    
        
         
     @property
@@ -163,8 +162,10 @@ class ImagePredictions:
         return pd.DataFrame(results)
     """
   
-    def train_model(self,trainloader,valloader,model, num_epochs=3):
+    def train_model(self,model, num_epochs=3):
         #criterion = nn.CrossEntropyLoss() #optimizer = optim.Rprop(model.parameters(), lr=0.01) #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
+        trainloader,valloader,_ =self._Utils_pro.Utils_pro.image_tensor()
+        criterion,optimizer,_=self._ModelsZoo.ModelsZoo.optimizer()
         since = time.time()
         best_model_wts = copy.deepcopy(model.state_dict())
         best_acc = 0.0
@@ -204,7 +205,7 @@ class ImagePredictions:
                 else:
                     inputs, labels = Variable(inputs), Variable(labels)
                 
-                self
+                
                 optimizer.zero_grad()
                 
                 outputs = model(inputs)
@@ -255,8 +256,8 @@ class ImagePredictions:
                 del inputs, labels, outputs, preds
                 torch.cuda.empty_cache()
             
-            avg_loss_val = loss_val /22718#len(X_val_img) #dataset_sizes[VAL]
-            avg_acc_val = acc_val /22718#len(X_val_img) #dataset_sizes[VAL]
+            avg_loss_val = loss_val /len(self.X_test_img) #dataset_sizes[VAL]
+            avg_acc_val = acc_val /len(self.X_val_img) #dataset_sizes[VAL]
             
             print()
             print("Epoch {} result: ".format(epoch))
@@ -279,7 +280,9 @@ class ImagePredictions:
             model.load_state_dict(best_model_wts)
             return model
     
-    def eval_model(model,Testloader, criterion):
+    def eval_model(self,model, criterion):
+        _,_,Testloader =self._Utils_pro.Utils_pro.image_tensor()
+        criterion,_,_=self._ModelsZoo.ModelsZoo.optimizer()
         since = time.time()
         avg_loss = 0
         avg_acc = 0
