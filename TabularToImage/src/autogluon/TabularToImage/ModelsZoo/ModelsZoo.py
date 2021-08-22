@@ -126,7 +126,7 @@ class ModelsZoo():
                     param.requires_grad = False 
                 model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
             elif 'shufflenet_v2_x1_0' == self.model_type:
-                model = models.shufflenet_v2_x0_0(pretrained=self.pretrained).to(device).double()
+                model = models.shufflenet_v2_x1_0(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
                 model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()
@@ -146,7 +146,7 @@ class ModelsZoo():
                     param.requires_grad = False
                 model.fc = nn.Linear(model.fc.in_features, self.num_classes).double
             elif 'mnasnet0_5' == self.model_type:
-                model = models.wide_resnet0_5(pretrained=self.pretrained).to(device).double()
+                model = models.mnasnet0_5(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False
                 model.classifier[1] = nn.Linear(model.classifier[1].in_features, self.num_classes)
@@ -175,7 +175,7 @@ class ModelsZoo():
                     param.requires_grad = False 
                 model.classifier[1] = nn.Linear(model.classifier[1].in_features, self.num_classes).double()
             elif 'resnext101_32x8d' == self.model_type:
-                model = models.resnext50_32x8d(pretrained=self.pretrained).to(device).double()
+                model = models.resnext101_32x8d(pretrained=self.pretrained).to(device).double()
                 for param in model.parameters():
                     param.requires_grad = False 
                 model.fc = nn.Linear(model.fc.in_features, self.num_classes).double()         
