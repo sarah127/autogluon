@@ -56,7 +56,7 @@ class ImagePredictions:
         #rainloader,valloader,Testloader =self._Utils_pro.Utils_pro.image_tensor()
         #criterion,optimizer,exp_lr_scheduler=self._ModelsZoo.ModelsZoo.optimizer()
         #use_gpu = torch.cuda.is_available()
-        
+        #models=self._ModelsZoo.ModelsZoo.create_model()
         
     
      
@@ -170,6 +170,7 @@ class ImagePredictions:
         #criterion = nn.CrossEntropyLoss() #optimizer = optim.Rprop(model.parameters(), lr=0.01) #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1)
         trainloader,valloader,_ =self._Utils_pro.Utils_pro.image_tensor()
         criterion,optimizer,_=self._ModelsZoo.ModelsZoo.optimizer()
+        model=self._ModelsZoo.ModelsZoo.create_model()
         use_gpu = torch.cuda.is_available()
         since = time.time()
         best_model_wts = copy.deepcopy(model.state_dict())
@@ -285,9 +286,10 @@ class ImagePredictions:
             model.load_state_dict(best_model_wts)
             return model
     
-    def eval_model(self,model, criterion):
+    def eval_model(self):
         _,_,Testloader =self._Utils_pro.Utils_pro.image_tensor()
         criterion,_,_=self._ModelsZoo.ModelsZoo.optimizer()
+        model=self._ModelsZoo.ModelsZoo.create_model()
         use_gpu = torch.cuda.is_available()
         since = time.time()
         avg_loss = 0
