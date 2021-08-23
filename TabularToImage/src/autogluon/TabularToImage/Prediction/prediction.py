@@ -17,8 +17,8 @@ import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
 from autogluon.tabular.trainer import AbstractTrainer
-from autogluon.TabularToImage.Utils_pro import  Utils_pro
-from autogluon.TabularToImage.ModelsZoo import ModelsZoo
+from autogluon.tabularToImage.utils_pro import  Utils_pro
+from autogluon.tabularToImage.modelszoo import ModelsZoo
 #from autogluon.TabularToImage.ModelsZoo.ModelsZoo import ModelsZoo
 class ImagePredictions:
     
