@@ -11,5 +11,6 @@ python3 -m pip install -e forecasting/
 python3 -m pip install -e TabularToImage/
 python3 -m pip install -e tabular_to_image/
 python3 -m pip install -e autogluon/
-sudo apt-get install python-dev graphviz libgraphviz-dev pkg-config
-sudo pip install pygraphviz
+#sudo apt-get install python-dev graphviz libgraphviz-dev pkg-config
+#sudo pip install pygraphviz
+python3 -m pip install pygraphviz
