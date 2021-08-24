@@ -16,10 +16,10 @@ from torch.autograd import Variable
 import numpy as np
 import torchvision
 from torchvision import datasets, models, transforms
-from autogluon.tabular.trainer import AbstractTrainer
 from autogluon.tabular_to_image.utils_pro import  Utils_pro
 from autogluon.tabular_to_image.models_zoo import ModelsZoo
 #from autogluon.TabularToImage.ModelsZoo.ModelsZoo import ModelsZoo
+
 class ImagePredictions:
     
     def init(self,**kwargs):
