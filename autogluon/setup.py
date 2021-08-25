@@ -24,6 +24,8 @@ install_requires = [
     f'autogluon.extra=={version}',
     f'autogluon.text=={version}',
     f'autogluon.vision=={version}',
+    f'autogluon.tabular_to_image=={version}',
+    f'autogluon.pyDeepInsight=={version}',
 ]
 
 install_requires = ag.get_dependency_version_ranges(install_requires)
