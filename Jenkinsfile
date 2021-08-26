@@ -79,6 +79,10 @@ install_forecasting = """
     python3 -m pip install --upgrade -e forecasting/
 """
 
+install_tabular_to_image = """
+    python3 -m pip install --upgrade -e tabular_to_image/
+"""
+
 stage("Unit Test") {
   parallel 'core': {
     node('linux-cpu') {
@@ -194,6 +198,34 @@ stage("Unit Test") {
       }
     }
   },
+  'tabular_to_image': {
+    node('linux-gpu') {
+      ws('workspace/autogluon-tabular_to_image-py3-v3') {
+        timeout(time: max_time, unit: 'TABULAR_TO_IMAGE') {
+          checkout scm
+          VISIBLE_GPU=env.EXECUTOR_NUMBER.toInteger() % 8
+          sh """#!/bin/bash
+          set -ex
+          conda env update -n autogluon-tabular_to_image-py3-v3 -f docs/build.yml
+          conda activate autogluon-tabular_to_image-py3-v3
+          conda list
+          ${setup_pip_venv}
+          ${setup_mxnet_gpu}
+          export CUDA_VISIBLE_DEVICES=${VISIBLE_GPU}
+          env
+
+          cd core/
+          python3 -m pip install --upgrade -e .
+          cd ../tabular_to_image/
+          python3 -m pip install --upgrade -e .
+          python3 -m pytest --junitxml=results.xml --runslow tests
+          ${cleanup_venv}
+          """
+        }
+      }
+    }
+  },
+
   'extra': {
     node('linux-gpu') {
       ws('workspace/autogluon-extra-py3-v3') {
@@ -699,6 +731,10 @@ stage("Build Docs") {
         cd ..
 
         cd mxnet/
+        python3 -m pip install --upgrade -e .
+        cd ..
+
+        cd tabular_to_image/
         python3 -m pip install --upgrade -e .
         cd ..
 
