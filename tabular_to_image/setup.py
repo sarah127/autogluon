@@ -31,6 +31,7 @@ requirements = [
     'networkx>=2.3,<3.0',
     f'autogluon.core=={version}',
     f'autogluon.features=={version}',
+   
 ]
 
 test_requirements = [
