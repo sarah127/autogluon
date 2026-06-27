@@ -27,12 +27,13 @@ requirements = [
     'torch',
     'torchvision',
 
+    
     'psutil>=5.7.3,<5.9',  # TODO: Consider capping to <6.0 instead, capping to 5.9 to avoid possible issues.
     'networkx>=2.3,<3.0',
-    f'autogluon=={version}', 
+    #f'autogluon.DeepInsight_auto=={version}' ,    
     f'autogluon.core=={version}',
     f'autogluon.features=={version}',
-    f'autogluon.tabular_to_image=={version}', 
+    #f'autogluon.tabular_to_image=={version}', 
 ]
 
 test_requirements = [
@@ -40,23 +41,32 @@ test_requirements = [
     'openml',
 ]
 
-"""
-extras_require = {
-    'fastai': [
-        'torch>=1.0,<2.0',
-        'fastai>=2.3.1,<3.0',
-    ]
 
+extras_require = {
+    'torch': [
+        'torch>=1.12.0,<1.13.1',
+             ],
+    'torchvision':[ 
+        'torchvision>0.12,<=0.13',    
+    
+                  ],       
+    'category_encoders':[
+               'category_encoders>=2.4.0',
+] ,
+ 
+    
 }
  
+
+
 all_requires = []
 # TODO: Consider adding 'skex' to 'all'
-for extra_package in [ 'fastai']:
+for extra_package in ['torch']:
     all_requires += extras_require[extra_package]
 all_requires = list(set(all_requires))
 extras_require['all'] = all_requires
  
-"""
+
  
 install_requires = requirements + test_requirements
 install_requires = ag.get_dependency_version_ranges(install_requires)
@@ -66,6 +76,6 @@ if __name__ == '__main__':
     setup_args = ag.default_setup_args(version=version, submodule=submodule)
     setup(
         install_requires=install_requires,
-        #extras_require=extras_require,
+        extras_require=extras_require,
         **setup_args,
     )
