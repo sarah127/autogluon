@@ -1,5 +1,4 @@
-import os
-from autogluon.core.constants import BINARY, MULTICLASS, SOFTCLASS, REGRESSION
+from autogluon.core.constants import BINARY, MULTICLASS, REGRESSION, SOFTCLASS
 
 DEFAULT_NUM_BOOST_ROUND = 10000
 MAX_CATEGORY_LEVELS = 100  # maximum number of allowed levels per categorical feature
@@ -19,15 +18,12 @@ def get_param_baseline(problem_type, num_classes=None):
         return get_param_binary_baseline()
 
 
-# TODO: `n_jobs` : the value -1, 0 doesn't set a model to use whole parallel threads in Scikit-learn API.
-#  Use the number of CPUs in the training system for now, but it could be lower than the number of CPUs in the inferencing system.
-#  xgboost plans to accept -1 for compability with other packages. After that, resolving this issue.
 def get_base_params():
     base_params = {
-        'n_estimators': DEFAULT_NUM_BOOST_ROUND,
-        'learning_rate': 0.1,
-        'n_jobs': os.cpu_count(),
-        'proc.max_category_levels' : MAX_CATEGORY_LEVELS,
+        "n_estimators": DEFAULT_NUM_BOOST_ROUND,
+        "learning_rate": 0.1,
+        "n_jobs": -1,
+        "proc.max_category_levels": MAX_CATEGORY_LEVELS,
     }
     return base_params
 
@@ -35,9 +31,8 @@ def get_base_params():
 def get_param_binary_baseline():
     params = get_base_params()
     baseline_params = {
-        'objective': 'binary:logistic',
-        'booster': 'gbtree',
-        'use_label_encoder': False,
+        "objective": "binary:logistic",
+        "booster": "gbtree",
     }
     params.update(baseline_params)
     return params
@@ -46,10 +41,9 @@ def get_param_binary_baseline():
 def get_param_multiclass_baseline(num_classes):
     params = get_base_params()
     baseline_params = {
-        'objective': 'multi:softmax',
-        'booster': 'gbtree',
-        'num_class': num_classes,
-        'use_label_encoder': False,
+        "objective": "multi:softprob",
+        "booster": "gbtree",
+        "num_class": num_classes,
     }
     params.update(baseline_params)
     return params
@@ -58,8 +52,8 @@ def get_param_multiclass_baseline(num_classes):
 def get_param_regression_baseline():
     params = get_base_params()
     baseline_params = {
-        'objective': 'reg:squarederror',
-        'booster': 'gbtree',
+        "objective": "reg:squarederror",
+        "booster": "gbtree",
     }
     params.update(baseline_params)
     return params

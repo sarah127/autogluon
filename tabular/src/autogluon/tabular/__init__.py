@@ -1,7 +1,9 @@
-import logging
+# noinspection PyUnresolvedReferences
+from autogluon.common.dataset import TabularDataset
 
-from autogluon.core.dataset import TabularDataset
-from autogluon.core.features.feature_metadata import FeatureMetadata
+# noinspection PyUnresolvedReferences
+from autogluon.common.features.feature_metadata import FeatureMetadata
+from autogluon.common.utils.log_utils import _add_stream_handler
 
 try:
     from .version import __version__
@@ -10,4 +12,4 @@ except ImportError:
 
 from .predictor import TabularPredictor
 
-logging.basicConfig(format='%(message)s')  # just print message in logs
+_add_stream_handler()

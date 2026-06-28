@@ -3,7 +3,7 @@ import logging
 
 from pandas import DataFrame
 
-from autogluon.core.features.types import R_CATEGORY, S_TEXT_AS_CATEGORY
+from autogluon.common.features.types import R_CATEGORY, S_TEXT_AS_CATEGORY
 
 from .abstract import AbstractFeatureGenerator
 
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 # TODO: LabelEncoderTransformer
 class LabelEncoderFeatureGenerator(AbstractFeatureGenerator):
     """Converts category features to int features by mapping to the category codes."""
+
     def _fit_transform(self, X: DataFrame, **kwargs) -> (DataFrame, dict):
         X_out = self._transform(X)
         feature_metadata_out_type_group_map_special = copy.deepcopy(self.feature_metadata_in.type_group_map_special)
@@ -34,4 +35,4 @@ class LabelEncoderFeatureGenerator(AbstractFeatureGenerator):
         return X
 
     def _more_tags(self):
-        return {'feature_interactions': False}
+        return {"feature_interactions": False}

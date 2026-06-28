@@ -1,5 +1,5 @@
 #!/bin/bash
 
-rm -rf _build
-d2lbook build rst
-d2lbook build html
+rm -rf _build/
+
+sphinx-build -b html . _build/html/

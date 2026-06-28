@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 class RenameFeatureGenerator(AbstractFeatureGenerator):
     """
     RenameFeatureGenerator renames the columns without altering their values.
-    This can be used to avoid column name collisions when transforming the same feature in multiple ways, or to highlight that a feature was derived from a particular pipeline.
+    This can be used to avoid column name collisions when transforming the same feature in multiple ways,
+    or to highlight that a feature was derived from a particular pipeline.
 
     Parameters
     ----------
@@ -25,6 +26,7 @@ class RenameFeatureGenerator(AbstractFeatureGenerator):
     **kwargs :
         Refer to :class:`AbstractFeatureGenerator` documentation for details on valid key word arguments.
     """
+
     def __init__(self, name_prefix=None, name_suffix=None, inplace=False, **kwargs):
         super().__init__(**kwargs)
         self._name_prefix = name_prefix
@@ -68,6 +70,6 @@ class RenameFeatureGenerator(AbstractFeatureGenerator):
 
     def _more_tags(self):
         return {
-            'feature_interactions': False,
-            'allow_post_generators': False,  # TODO: This might not be necessary anymore
+            "feature_interactions": False,
+            "allow_post_generators": False,  # TODO: This might not be necessary anymore
         }

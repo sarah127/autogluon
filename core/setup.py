@@ -1,69 +1,82 @@
 #!/usr/bin/env python
+# Thin setup.py: see common/setup.py. Supplies the dynamic version + computed deps
+# (caps from _setup_utils.DEPENDENT_PACKAGES + exact `==<version>` sibling pins) and writes version.py.
 ###########################
 # This code block is a HACK (!), but is necessary to avoid code duplication. Do NOT alter these lines.
-import os
-from setuptools import setup
 import importlib.util
+import os
+
+from setuptools import setup
+
 filepath = os.path.abspath(os.path.dirname(__file__))
-filepath_import = os.path.join(filepath, '..', 'core', 'src', 'autogluon', 'core', '_setup_utils.py')
+filepath_import = os.path.join(filepath, "..", "core", "src", "autogluon", "core", "_setup_utils.py")
+if not os.path.exists(filepath_import):
+    filepath_import = os.path.join(filepath, "_setup_utils.py")
 spec = importlib.util.spec_from_file_location("ag_min_dependencies", filepath_import)
 ag = importlib.util.module_from_spec(spec)
-# Identical to `from autogluon.core import _setup_utils as ag`, but works without `autogluon.core` being installed.
 spec.loader.exec_module(ag)
 ###########################
 
-version = ag.load_version_file()
-version = ag.update_version(version, use_file_if_exists=False, create_file=True)
+submodule = "core"
+version = ag.update_version(ag.load_version_file())
 
-submodule = 'core'
 install_requires = [
     # version ranges added in ag.get_dependency_version_ranges()
-    'numpy',
-    'scipy',
-    'scikit-learn',
-    'pandas',
-    'tqdm',
-    'graphviz',
-
-    'cython',  # TODO: Do we need cython here? Why is cython not version capped / minned?
-    'ConfigSpace==0.4.19',
-    'tornado>=5.0.1',
-    'requests',
-    'matplotlib',
-    'paramiko>=2.4',
-    'dask>=2.6.0',
-    'distributed>=2.6.0',
-    'boto3',
-    'autograd>=1.3',
-    'dill>=0.3.3,<1.0',
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "networkx",
+    "pandas",
+    "tqdm",
+    "requests",
+    "matplotlib",
+    "boto3",
+    "typing-extensions",
+    f"autogluon.common=={version}",
+    f"autogluon.features=={version}",
 ]
 
 extras_require = {
-    'extra_searchers': [
-        'scikit-optimize',  # Optional due to only being rarely used and due to breaking install in the past
+    "ray": [
+        # Ray<=2.53 does not support py313 on Windows
+        "ray[default]>=2.43.0,<2.54; platform_system != 'Windows' or python_version != '3.13'",  # sync with common/src/autogluon/common/utils/try_import.py
+    ],
+    "raytune": [
+        "pyarrow>=15.0.0",  # cap Pyarrow to fix source installation - https://github.com/autogluon/autogluon/issues/4519
+        "ray[default,tune]>=2.43.0,<2.54; platform_system != 'Windows' or python_version != '3.13'",  # sync with common/src/autogluon/common/utils/try_import.py
+        # TODO: consider alternatives as hyperopt is not actively maintained.
+        "hyperopt>=0.2.7,<0.2.8",  # This is needed for the bayes search to work.
+        # 'GPy>=1.10.0,<1.11.0'  # TODO: Enable this once PBT/PB2 are supported by ray lightning
+        "stevedore<5.5",
+        "setuptools<82",
     ],
 }
 
 tests_require = [
-    'pytest',
+    "pytest",
+    "types-requests",
+    "types-setuptools",
+    "pytest-mypy",
+    "flake8",
+    "pre-commit",
 ]
-for extra_package in ['extra_searchers']:
-    tests_require += extras_require[extra_package]
-tests_require = list(set(tests_require))
-extras_require['tests'] = tests_require
+
+all_requires = []
+for extra_package in ["ray", "raytune"]:
+    all_requires += extras_require[extra_package]
+all_requires = list(set(all_requires))
+extras_require["all"] = all_requires
+extras_require["tests"] = list(set(tests_require))
 
 install_requires = ag.get_dependency_version_ranges(install_requires)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ag.create_version_file(version=version, submodule=submodule)
-    setup_args = ag.default_setup_args(version=version, submodule=submodule)
     setup(
+        version=version,
+        long_description=ag.load_readme(),
+        long_description_content_type="text/markdown",
+        classifiers=ag.get_classifiers(),
         install_requires=install_requires,
         extras_require=extras_require,
-        entry_points={
-            'console_scripts': [
-                'agremote = autogluon.core.scheduler.remote.cli:main',
-            ]
-        },
-        **setup_args,
     )
