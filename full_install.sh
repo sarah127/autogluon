@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
+<<<<<<< HEAD
+python3 -m pip install -e core/
+python3 -m pip install -e features/
+python3 -m pip install -e tabular/[all]
+python3 -m pip install -e mxnet/
+python3 -m pip install -e extra/
+python3 -m pip install -e text/
+python3 -m pip install -e vision/
+python3 -m pip install -e forecasting/
+python3 -m pip install -e tabular_to_image/[all]
+python3 -m pip install -e autogluon/
+=======
 
 # Get the directory of the script and always change to it
 script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -103,3 +115,4 @@ else
   uvpip install --refresh "common/[tests]"
   uvpip install "features/" "core/[all,tests]" "tabular/[all,tests]" "multimodal/[tests]" "timeseries/[all,tests]" "autogluon/"
 fi
+>>>>>>> upstream/master

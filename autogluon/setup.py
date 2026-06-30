@@ -21,11 +21,23 @@ submodule = None  # meta package
 version = ag.update_version(ag.load_version_file())
 
 install_requires = [
+<<<<<<< HEAD
+    f'autogluon.core=={version}',
+    f'autogluon.features=={version}',
+    f'autogluon.tabular[all]=={version}',
+    f'autogluon.mxnet=={version}',
+    f'autogluon.extra=={version}',
+    f'autogluon.text=={version}',
+    f'autogluon.vision=={version}',
+    f'autogluon.tabular_to_image=={version}',
+    f'autogluon.TabularToImage=={version}',
+=======
     f"autogluon.core[all]=={version}",
     f"autogluon.features=={version}",
     f"autogluon.tabular[all]=={version}",
     f"autogluon.multimodal=={version}",
     f"autogluon.timeseries[all]=={version}",
+>>>>>>> upstream/master
 ]
 
 extras_require = {

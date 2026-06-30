@@ -27,6 +27,12 @@ from autogluon.core.utils import (
 )
 from autogluon.features.generators import PipelineFeatureGenerator
 
+<<<<<<< HEAD
+from autogluon.tabular.trainer.abstract_trainer import AbstractTrainer
+from autogluon.core.data.label_cleaner import LabelCleaner, LabelCleanerMulticlassToBinary
+
+=======
+>>>>>>> upstream/master
 logger = logging.getLogger(__name__)
 
 

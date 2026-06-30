@@ -67,6 +67,13 @@ from autogluon.core.utils.loaders import load_pkl, load_str
 from autogluon.core.utils.savers import save_pkl, save_str
 from autogluon.core.utils.utils import generate_train_test_split_combined
 
+<<<<<<< HEAD
+from autogluon.tabular.configs.hyperparameter_configs import get_hyperparameter_config
+from autogluon.tabular.configs.feature_generator_presets import get_default_feature_generator
+from autogluon.tabular.configs.presets_configs import tabular_presets_dict
+from autogluon.tabular.learner import AbstractLearner, DefaultLearner
+from autogluon.tabular.trainer import AbstractTrainer
+=======
 from ..configs.feature_generator_presets import get_default_feature_generator
 from ..configs.hyperparameter_configs import get_hyperparameter_config
 from ..configs.pipeline_presets import (
@@ -78,6 +85,7 @@ from ..learner import AbstractTabularLearner, DefaultLearner
 from ..registry import ag_model_registry
 from ..trainer.abstract_trainer import AbstractTabularTrainer
 from ..version import __version__
+>>>>>>> upstream/master
 
 logger = logging.getLogger(__name__)  # return autogluon root logger
 

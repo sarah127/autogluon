@@ -22,6 +22,23 @@ version = ag.update_version(ag.load_version_file())
 
 install_requires = [
     # version ranges added in ag.get_dependency_version_ranges()
+<<<<<<< HEAD
+    'numpy',
+    'scipy',
+    'pandas',
+    'scikit-learn',
+    'pygraphviz',
+    
+
+    'psutil>=5.7.3,<5.9',  # TODO: Consider capping to <6.0 instead, capping to 5.9 to avoid possible issues.
+    'networkx>=2.3,<3.0',
+    f'autogluon.features=={version}',
+    f'autogluon.tabular=={version}',
+]
+
+test_requirements = [
+    'pytest',
+=======
     "numpy",
     "scipy",
     "pandas",
@@ -29,6 +46,7 @@ install_requires = [
     "networkx",
     f"autogluon.core=={version}",
     f"autogluon.features=={version}",
+>>>>>>> upstream/master
 ]
 
 extras_require = {

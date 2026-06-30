@@ -18,10 +18,16 @@ from autogluon.core.models import AbstractModel
 from autogluon.core.models._utils import get_early_stopping_rounds
 from autogluon.core.utils.exceptions import TimeLimitExceeded
 
+<<<<<<< HEAD
+from autogluon.tabular.models.catboost.catboost_utils import construct_custom_catboost_metric
+from autogluon.tabular.models.catboost.hyperparameters.parameters import get_param_baseline
+from autogluon.tabular.models.catboost.hyperparameters.searchspaces import get_default_searchspace
+=======
 from .callbacks import EarlyStoppingCallback, MemoryCheckCallback, TimeCheckCallback
 from .catboost_utils import CATBOOST_EVAL_METRIC_TO_LOSS_FUNCTION, get_catboost_metric_from_ag_metric
 from .hyperparameters.parameters import get_param_baseline
 from .hyperparameters.searchspaces import get_default_searchspace
+>>>>>>> upstream/master
 
 logger = logging.getLogger(__name__)
 

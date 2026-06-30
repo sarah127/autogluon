@@ -5,9 +5,14 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+<<<<<<< HEAD
+from autogluon.core.models.ensemble.stacker_ensemble_model import StackerEnsembleModel
+from autogluon.core.models.greedy_ensemble.greedy_weighted_ensemble_model import GreedyWeightedEnsembleModel
+=======
 
 from ..greedy_ensemble.greedy_weighted_ensemble_model import GreedyWeightedEnsembleModel
 from .stacker_ensemble_model import StackerEnsembleModel
+>>>>>>> upstream/master
 
 logger = logging.getLogger(__name__)
 

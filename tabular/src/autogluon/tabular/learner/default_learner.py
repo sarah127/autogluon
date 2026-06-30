@@ -9,8 +9,16 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
 
+<<<<<<< HEAD
+from autogluon.core.constants import BINARY, MULTICLASS, REGRESSION, QUANTILE, AUTO_WEIGHT, BALANCE_WEIGHT
+from autogluon.core.utils.utils import augment_rare_classes, extract_column
+
+from autogluon.tabular.learner.abstract_learner import AbstractLearner
+from autogluon.tabular.trainer.auto_trainer import AutoTrainer
+=======
 from autogluon.common.utils.log_utils import convert_time_in_s_to_log_friendly
 from autogluon.core.constants import AUTO_WEIGHT, BALANCE_WEIGHT, BINARY, MULTICLASS, QUANTILE, REGRESSION
+>>>>>>> upstream/master
 from autogluon.core.data import LabelCleaner
 from autogluon.core.data.cleaner import Cleaner
 from autogluon.core.utils.time import sample_df_for_time_func, time_func
